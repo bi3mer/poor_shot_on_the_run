@@ -2,6 +2,12 @@ const config = {
     debug: true,
     displayTimeOut: 10000,
     initialDisplayTimeout: 1000,
+    states: {
+        menu: 0,
+        preGame: 1,
+        game: 2,
+        postGame: 3
+    },
     entities: {
         player: {
             type: 0,

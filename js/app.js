@@ -44,7 +44,7 @@ setInterval(() => {
 }, config.displayTimeOut);
 
 let entities = [];
-const player = new Entity(10, 10, config.entities.player);
+let player = new Entity(10, 10, config.entities.player);
 
 const drawMenu = () => {
 
@@ -78,6 +78,39 @@ const handlePlayerInput = (e) => {
   display.draw(player.x, player.y, player.asciiChar, player.color);  
 };
 
-// this sets off our game loop
-display.draw(player.x, player.y, player.asciiChar, player.color);
-window.addEventListener('keydown', handlePlayerInput);
+const menuState = () => {
+
+};
+
+const preGameState = () => {
+
+};
+
+const gameState = () => {
+  // this is a turn based game and the handle player input is our loop
+  // and will handle everything
+  display.draw(player.x, player.y, player.asciiChar, player.color);
+  window.addEventListener('keydown', handlePlayerInput);
+}
+
+const postGameState = () => {
+  entities = [];
+  player = new Entity(10, 10, config.entities.player);
+};
+
+const updateState = (state) => {
+  if(state === config.states.menu) {
+    menuState();
+  } else if(state === config.states.preGame) {
+    preGameState();
+  } else if(state === config.states.game) {
+    gameState();
+  } else if(state === config.states.postGame) {
+    postGameState();
+  } else {
+    console.error('undefined state, going to post game state', state);
+    postGameState();
+  }
+};
+
+updateState(config.states.menu);
