@@ -44,26 +44,40 @@ setInterval(() => {
 }, config.displayTimeOut);
 
 let entities = [];
-const player = new Entity(0, 0, config.entities.player);
+const player = new Entity(10, 10, config.entities.player);
 
 const drawMenu = () => {
 
 };
 
 const initializeGame = () => {
-  
+
 };
 
 const drawGame = () => {
   // draw environment
-  display.draw(player.x, player.y, player.asciiChar, player.color)
   // draw enemies
 };
 
-const handlePlayerInput = () => {
-  alert('hi');
+const handlePlayerInput = (e) => {
+  // clear player at current location
+  display.draw(player.x, player.y, '');
+
+  // get input for update
+  if(e.key === 'a' || e.key === 'ArrowLeft') {
+    player.move(West());
+  } else if(e.key === 's' || e.key === 'ArrowDown') {
+    player.move(North());
+  } else if(e.key === 'd' || e.key === 'ArrowRight') {
+    player.move(East());
+  } else if(e.key === 'w' || e.key === 'ArrowUp') {
+    player.move(South());
+  }
+
+  // draw player at new location
+  display.draw(player.x, player.y, player.asciiChar, player.color);  
 };
 
 // this sets off our game loop
-
+display.draw(player.x, player.y, player.asciiChar, player.color);
 window.addEventListener('keydown', handlePlayerInput);
