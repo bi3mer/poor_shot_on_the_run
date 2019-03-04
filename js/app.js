@@ -1,5 +1,10 @@
 'use strict';
 
+let width = 100;
+let height = 100;
+let runningInterval = undefined;
+let runningEventListener = undefined;
+
 const buildScreenOptions = () => {
   return {
       width: 1,
@@ -22,7 +27,10 @@ const fitDisplay = () => {
   options.width = size[0] - 2;
   options.height = size[1] - 2;
   display.setOptions(options);
-}
+
+  width = options.width;
+  height = options.height;
+};
 
 if(config.debug) {
   ROT.RNG.setSeed(0);
@@ -46,10 +54,6 @@ setInterval(() => {
 let entities = [];
 let player = new Entity(10, 10, config.entities.player);
 
-const drawMenu = () => {
-
-};
-
 const initializeGame = () => {
 
 };
@@ -64,38 +68,64 @@ const handlePlayerInput = (e) => {
   display.draw(player.x, player.y, '');
 
   // get input for update
+  move = undefined;
   if(e.key === 'a' || e.key === 'ArrowLeft') {
-    player.move(West());
+    move = West();
   } else if(e.key === 's' || e.key === 'ArrowDown') {
-    player.move(North());
+    move = North();
   } else if(e.key === 'd' || e.key === 'ArrowRight') {
-    player.move(East());
+    move = East();
   } else if(e.key === 'w' || e.key === 'ArrowUp') {
-    player.move(South());
+    move = South();
   }
 
-  // draw player at new location
+  if(move !== undefined) {
+    // @todo: check if location is valid via collision checks etc.
+    player.move(move);
+  }
+
   display.draw(player.x, player.y, player.asciiChar, player.color);  
 };
 
 const menuState = () => {
+  MenuInputCallBack = () => {
+    updateState(config.states.preGame);
+  };
 
+  const menu = new Menu();
+  runningInterval = setInterval(() => {
+    display.clear();
+    menu.draw(width, height);
+  }, config.displayTimeOut);
+
+  runningEventListener = menu.handleInput;
+  window.addEventListener('keydown', runningEventListener);
 };
 
 const preGameState = () => {
+  // kill menu drawing interval
+  clearInterval(runningInterval);
 
+  // kill event lsitener for menu
+  window.removeEventListener('keydown', runningEventListener);
+  
+  display.clear();
+  alert('hi');
 };
 
 const gameState = () => {
   // this is a turn based game and the handle player input is our loop
   // and will handle everything
-  display.draw(player.x, player.y, player.asciiChar, player.color);
-  window.addEventListener('keydown', handlePlayerInput);
+  setTimeout(() => {
+    display.draw(player.x, player.y, player.asciiChar, player.color);
+    window.addEventListener('keydown', handlePlayerInput);
+  }, config.initialDisplayTimeout);
 }
 
 const postGameState = () => {
   entities = [];
   player = new Entity(10, 10, config.entities.player);
+  window.removeEventListener("keydown", handlePlayerInput);
 };
 
 const updateState = (state) => {
