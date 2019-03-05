@@ -1,9 +1,7 @@
 'use strict';
 
-let width = 100;
-let height = 100;
-let runningInterval = undefined;
-let runningEventListener = undefined;
+this.width = 100;
+this.height = 100;
 
 const buildScreenOptions = () => {
   return {
@@ -28,8 +26,8 @@ const fitDisplay = () => {
   options.height = size[1] - 2;
   display.setOptions(options);
 
-  width = options.width;
-  height = options.height;
+  this.width = options.width;
+  this.height = options.height;
 };
 
 if(config.debug) {
@@ -68,7 +66,7 @@ const handlePlayerInput = (e) => {
   display.draw(player.x, player.y, '');
 
   // get input for update
-  move = undefined;
+  let move = undefined;
   if(e.key === 'a' || e.key === 'ArrowLeft') {
     move = West();
   } else if(e.key === 's' || e.key === 'ArrowDown') {
@@ -88,45 +86,56 @@ const handlePlayerInput = (e) => {
 };
 
 const menuState = () => {
-  const menu = new Menu();
-  runningInterval = setInterval(() => {
+  console.log('entered menu state');
+
+  this.runningInterval = setInterval(() => {
     display.clear();
-    menu.draw(width, height);
+    Menu.draw(display, this.width, this.height);
   }, config.displayTimeOut);
 
-  runningEventListener = (e) => {
-    menu.handleInput(e, () => {
+  this.runningEventListener = (e) => {
+    Menu.handleInput(e, () => {
       updateState(config.states.preGame); 
     });
   };
 
-  window.addEventListener('keydown', runningEventListener);
+  window.addEventListener('keydown', this.runningEventListener);
 };
 
 const preGameState = () => {
-  // kill menu drawing interval
-  clearInterval(runningInterval);
+  console.log('pre game state entered');
 
-  // kill event lsitener for menu
-  window.removeEventListener('keydown', runningEventListener);
+  this.runningInterval = setInterval(() => {
+    display.clear();
+    Instructions.draw(display);
+  }, config.displayTimeOut);
   
-  display.clear();
-  alert('hi');
+  this.runningEventListener = (e) => {
+    Instructions.handleInput(e, () => {
+      updateState(config.states.game);
+    });
+  };
+
+  window.addEventListener('keydown', this.runningEventListener, true);
 };
 
 const gameState = () => {
+  console.log('game state entered');
+  clearInterval(this.runningInterval);
+  window.removeEventListener('keydown', this.runningEventListener, true);
+  display.clear();
+  
   // this is a turn based game and the handle player input is our loop
   // and will handle everything
   setTimeout(() => {
     display.draw(player.x, player.y, player.asciiChar, player.color);
-    window.addEventListener('keydown', handlePlayerInput);
+    window.addEventListener('keydown', handlePlayerInput, true);
   }, config.initialDisplayTimeout);
 }
 
 const postGameState = () => {
-  entities = [];
-  player = new Entity(10, 10, config.entities.player);
-  window.removeEventListener("keydown", handlePlayerInput);
+  // rather than deal with resetting everything, just reload the page
+  document.location.reload(true)
 };
 
 const updateState = (state) => {

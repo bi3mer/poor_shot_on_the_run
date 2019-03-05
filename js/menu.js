@@ -1,28 +1,24 @@
 'use strict';
 
-let Menu = class {
-  draw(width, height){
-    // draw thte title
-    let x = (width - (config.title.length / 2)) / 3;
-    let y = 0.25 * height
-    for(let i = 0; i < config.title.length; ++i) {
-      display.draw(x, y, config.title[i], config.menu.titleColor);
-      ++x;
-    }
+const Menu = {};
 
-    // draw start with asterisk
-    x = (width - (config.title.length / 5)) / 3;
-    y = 0.5 * height;
-    const text = "Press Enter to Start";
-    for(let i = 0; i < text.length; ++i) {
-      display.draw(x, y, text[i], config.menu.startColor);
-      ++x;
-    }
-  };
+Menu.draw = (display, width, height) => {
+  let x = (width - (config.title.length / 2)) / 3;
+  let y = 0.25 * height
+  Utility.displayTextOnLine(x, y, display, config.title, config.menu.titleColor);
 
-  handleInput(e, updateStateCallback) {
-    if(e.key === 'Enter') {
-      updateStateCallback();
-    }
-  };
+  x = (width - (config.title.length / 5)) / 3;
+  y = 0.5 * height;
+  const text = "Press Enter to Start";
+  Utility.displayTextOnLine(x, y, display, text, config.menu.startColor);
+};
+
+Menu.handleInput = (e, updateStateCallback) => {
+  console.log('menu still alive');
+  if(e.key === 'Enter') {
+    clearInterval(this.runningInterval);
+    window.removeEventListener('keydown', this.runningEventListener)
+
+    updateStateCallback();
+  }
 };
