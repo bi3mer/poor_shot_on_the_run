@@ -1,7 +1,5 @@
 'use strict';
 
-let MenuInputCallBack = undefined;
-
 let Menu = class {
   draw(width, height){
     // draw thte title
@@ -22,9 +20,9 @@ let Menu = class {
     }
   };
 
-  handleInput(e) {
+  handleInput(e, updateStateCallback) {
     if(e.key === 'Enter') {
-      MenuInputCallBack();
+      updateStateCallback();
     }
   };
 };

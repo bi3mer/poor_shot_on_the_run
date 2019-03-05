@@ -88,17 +88,18 @@ const handlePlayerInput = (e) => {
 };
 
 const menuState = () => {
-  MenuInputCallBack = () => {
-    updateState(config.states.preGame);
-  };
-
   const menu = new Menu();
   runningInterval = setInterval(() => {
     display.clear();
     menu.draw(width, height);
   }, config.displayTimeOut);
 
-  runningEventListener = menu.handleInput;
+  runningEventListener = (e) => {
+    menu.handleInput(e, () => {
+      updateState(config.states.preGame); 
+    });
+  };
+
   window.addEventListener('keydown', runningEventListener);
 };
 
