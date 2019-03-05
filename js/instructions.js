@@ -58,7 +58,6 @@ Instructions.draw = (display) => {
 
 
 Instructions.handleInput = (e, updateStateCallback) => {
-  console.log('instructions still alive');
   if(e.key === 'Enter') {
     clearInterval(this.runningInterval);
     window.removeEventListener('keydown', this.runningEventListener)

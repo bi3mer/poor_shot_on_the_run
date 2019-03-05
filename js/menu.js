@@ -14,7 +14,6 @@ Menu.draw = (display, width, height) => {
 };
 
 Menu.handleInput = (e, updateStateCallback) => {
-  console.log('menu still alive');
   if(e.key === 'Enter') {
     clearInterval(this.runningInterval);
     window.removeEventListener('keydown', this.runningEventListener)
