@@ -9,8 +9,13 @@ Menu.draw = (display, width, height) => {
 
   x = (width - (config.title.length / 5)) / 3;
   y = 0.5 * height;
-  const text = "Press Enter to Start";
+  let text = "Press Enter to Start";
   Utility.displayTextOnLine(x, y, display, text, config.menu.startColor);
+
+  text = "By: Colan Biemer"
+  x = width - text.length;
+  y = height - 1;
+  Utility.displayTextOnLine(x, y, display, text, config.menu.titleColor);
 };
 
 Menu.handleInput = (e, updateStateCallback) => {
