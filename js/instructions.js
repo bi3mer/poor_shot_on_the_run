@@ -55,8 +55,6 @@ Instructions.draw = (display) => {
   Utility.displayTextOnLine(x, y, display, text, config.menu.startColor);
 };
 
-
-
 Instructions.handleInput = (e, updateStateCallback) => {
   if(e.key === 'Enter') {
     clearInterval(this.runningInterval);

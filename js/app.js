@@ -124,6 +124,13 @@ const gameState = () => {
   clearInterval(this.runningInterval);
   window.removeEventListener('keydown', this.runningEventListener, true);
   display.clear();
+
+
+  for(let x = 0; x < 10; ++x) {
+    for( let y = 0; y < 10; ++y) {
+      GameMap.drawPointMapPoint(x, y, '', config.map.type.water, display);
+    }
+  }
   
   // this is a turn based game and the handle player input is our loop
   // and will handle everything
