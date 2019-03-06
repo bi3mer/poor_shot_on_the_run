@@ -50,7 +50,8 @@ setInterval(() => {
 }, config.displayTimeOut);
 
 let entities = [];
-let player = new Entity(10, 10, config.entities.player);
+Game.player = new Entity(10, 10, config.entities.player);
+Game.addEntity(Game.player);
 
 const initializeGame = () => {
 
@@ -63,7 +64,7 @@ const drawGame = () => {
 
 const handlePlayerInput = (e) => {
   // clear player at current location
-  display.draw(player.x, player.y, '');
+  display.draw(Game.player.x, Game.player.y, '');
 
   // get input for update
   let move = undefined;
@@ -82,7 +83,7 @@ const handlePlayerInput = (e) => {
     player.move(move);
   }
 
-  display.draw(player.x, player.y, player.asciiChar, player.color);  
+  display.draw(Game.player.x, Game.player.y, Game.player.asciiChar, Game.player.color);  
 };
 
 const menuState = () => {
@@ -124,18 +125,11 @@ const gameState = () => {
   clearInterval(this.runningInterval);
   window.removeEventListener('keydown', this.runningEventListener, true);
   display.clear();
-
-
-  for(let x = 0; x < 10; ++x) {
-    for( let y = 0; y < 10; ++y) {
-      GameMap.drawPointMapPoint(x, y, '', config.map.type.water, display);
-    }
-  }
   
   // this is a turn based game and the handle player input is our loop
   // and will handle everything
   setTimeout(() => {
-    display.draw(player.x, player.y, player.asciiChar, player.color);
+    Game.drawMap(display, this.width, this.height);
     window.addEventListener('keydown', handlePlayerInput, true);
   }, config.initialDisplayTimeout);
 }

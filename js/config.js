@@ -27,8 +27,12 @@ const config = {
         startColor: "#FF0000"
     }, 
     map: {
-        frequency: 0.8,
-        waterThreshold: 0.05,
+        width: 2000,
+        height: 2000,
+        minRiverCount: 2,
+        maxRiverCount: 5,
+        minRiverWidth: 2,
+        maxRiverWidth: 4,
         type: {
             water: 0,
             ground: 1,
