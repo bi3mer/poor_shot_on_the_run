@@ -51,7 +51,6 @@ setInterval(() => {
 
 let entities = [];
 Game.player = new Entity(10, 10, config.entities.player);
-Game.addEntity(Game.player);
 
 const initializeGame = () => {
 

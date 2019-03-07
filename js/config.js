@@ -33,6 +33,10 @@ const config = {
         maxRiverCount: 5,
         minRiverWidth: 2,
         maxRiverWidth: 4,
+        minVillageCount: 5,
+        maxVillageCount: 8,
+        minVillageSize: 30,
+        maxVillageSize: 60,
         type: {
             water: 0,
             ground: 1,
@@ -42,19 +46,15 @@ const config = {
         },
         water: {
             char: '',
-            color: {
-                r: 0,
-                g: 119,
-                b: 190
-            }
+            color: "#0077be"
         },
         ground: {
             char: '',
-            color: {
-                r: 237, 
-                g: 201, 
-                b: 175
-            }
-        }
+            color: "#8c3b0c"
+        },
+        villageGround: {
+            char: '',
+            color: '#9b5801'
+        },
     }
 };

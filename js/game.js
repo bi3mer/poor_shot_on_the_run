@@ -6,42 +6,115 @@ Game.trails = {};
 Game.riverCount = Utility.range(config.map.minRiverCount, config.map.maxRiverCount);
 Game.directions = [North(), East(), South(), West()]
 Game.riversGenerated = 0;
-Game.riverGenerationInterval = undefined;
-Game.riverCarvingInterval = undefined;
+
+Game.generationInterval = undefined;
+Game.carvingInterval = undefined;
 
 Game.startX = undefined; 
 Game.startY = undefined;
 Game.endX = undefined;
 Game.endY = undefined;
 
+Game.villages = [];
+
 const constructColor = (r, g, b) => {
     return "rgb(" + r + "," + g + "," + b + ")";
 };
 
-const carveVillagesAndRoadsIntoMap = (w, h) => {
-    console.log('hi')
+const carve = (type) => {
+    Game.carvingInterval = setInterval(() => {
+        const maxIterations = 200;
+        let iterationCount = 0;
+
+        while(Game.startX != Game.endX && Game.startY != Game.endY) {
+            let lowestCost = Utility.manhattanDistance(Game.startX + Game.directions[0].east, Game.startY + Game.directions[0].north, Game.endX, Game.endY);
+            let bestIndex = 0;
+
+            // find best cardinal direction
+            for(let j = 1; j < Game.directions.length; ++j) {
+                let newCost = Utility.manhattanDistance(Game.startX + Game.directions[j].east, Game.startY + Game.directions[j].north, Game.endX, Game.endY);
+
+                if(newCost < lowestCost) {
+                    bestIndex = j;
+                    lowestCost = newCost;
+                }
+            }
+            
+            // fill in map position
+            Game.startX += Game.directions[bestIndex].east;
+            Game.startY += Game.directions[bestIndex].north;
+            Game.map[Game.startY][Game.startX] = type;
+
+            iterationCount += 1;
+            if(iterationCount >= maxIterations) {
+                return;
+            }
+        }
+        
+        console.log('ending interval');
+        clearInterval(Game.carvingInterval);
+        Game.carvingInterval = undefined;
+        Game.riversGenerated += 1;
+    }, 1)
+}
+
+const carveRoadsIntoMap = (w, h, callback) => {
+    console.log(Game.villages);
+    callback();
 };
 
-const carveRiversIntoMap = (w, h) => {
-    Game.riverGenerationInterval = setInterval(() => {
-        // console.log(Game.riversGenerated >= Game.riverCount);
-        if(Game.riversGenerated >= Game.riverCount) {
-            clearInterval(Game.riverGenerationInterval);
-            Game.riverGenerationInterval = undefined;
-            carveVillagesAndRoadsIntoMap(w, h);
+const buildVillages = (w, h, callback) => {
+    const color = config.map.villageGround.color;
+    Game.villagesGenerated = 0;
+    Game.villageCount = Utility.range(config.map.minVillageCount, config.map.maxVillageCount);
+
+    Game.generationInterval = setInterval(() => {
+        console.log(Game.villagesGenerated);
+        if(Game.villagesGenerated >= Game.villageCount) {
+            console.log('hi world')
+            clearInterval(Game.generationInterval);
+            Game.generationInterval = null;
+            callback();
+
             return;
         }
 
-        if(Game.riverCarvingInterval !== undefined) {
+        let villageWidth = Utility.range(config.map.minVillageSize, config.map.maxVillageSize);
+        let villageHeight = Utility.range(config.map.minVillageSize, config.map.maxVillageSize);
+
+        let x = Utility.range(villageWidth, w - villageWidth - 1);
+        let y = Utility.range(villageHeight, h - villageHeight - 1);
+
+        x -= Math.floor(villageWidth / 2);
+        y -= Math.floor(villageHeight / 2);
+
+        Game.villages.push([x, y]);
+
+        for(let j = 0; j < villageHeight; ++j) {
+            for(let i = 0; i < villageHeight; ++i) {
+                Game.map[y + j][x + i] = config.map.type.villageGround;
+            }
+        }
+
+        ++Game.villagesGenerated;
+    }, 1);
+};
+
+const carveRiversIntoMap = (w, h, callback) => {
+    Game.generationInterval = setInterval(() => {
+        // console.log(Game.riversGenerated >= Game.riverCount);
+        if(Game.riversGenerated >= Game.riverCount) {
+            clearInterval(Game.generationInterval);
+            Game.generationInterval = undefined;
+            callback();
+
+            return;
+        }
+
+        if(Game.carvingInterval !== undefined) {
             // console.log('still running previous interval')
             return;
         }
-
-        // const min = config.map.minRiverWidth;
-        // const max = config.map.maxRiverWidth;
-
-        // @todo: use this
-        // const riverWidth = Utility.range(min, max)
 
         if(Math.random() > 0.5) {
             Game.startX = 0;
@@ -63,48 +136,7 @@ const carveRiversIntoMap = (w, h) => {
         Game.map[Game.startY][Game.startX] = config.map.type.water;
 
         // console.log('starting interval');
-        Game.riverCarvingInterval = setInterval(() => {
-            const maxIterations = 200;
-            let iterationCount = 0;
-
-            while(Game.startX != Game.endX && Game.startY != Game.endY) {
-                let lowestCost = Utility.manhattanDistance(Game.startX + Game.directions[0].east, Game.startY + Game.directions[0].north, Game.endX, Game.endY);
-                let bestIndex = 0;
-    
-                // find best cardinal direction
-                for(let j = 1; j < Game.directions.length; ++j) {
-                    let newCost = Utility.manhattanDistance(Game.startX + Game.directions[j].east, Game.startY + Game.directions[j].north, Game.endX, Game.endY);
-    
-                    if(newCost < lowestCost) {
-                        bestIndex = j;
-                        lowestCost = newCost;
-                    }
-                }
-                
-                // fill in map position
-                Game.startX += Game.directions[bestIndex].east;
-                Game.startY += Game.directions[bestIndex].north;
-                // console.log(Game.startX, Game.startY);
-                if(Game.map[Game.startY] === undefined) {
-                    console.error(Game.startY);
-                }
-                if(Game.map[Game.startY] === undefined) {
-                    console.log(Game.startX);
-                    console.log(Game.map[Game.startY])
-                }
-                Game.map[Game.startY][Game.startX] = config.map.type.water;
-
-                iterationCount += 1;
-                if(iterationCount >= maxIterations) {
-                    return;
-                }
-            }
-            
-            console.log('ending interval');
-            clearInterval(Game.riverCarvingInterval);
-            Game.riverCarvingInterval = undefined;
-            Game.riversGenerated += 1;
-        }, 1)
+        carve(config.map.type.water)
     }, 1);
 };
 
@@ -123,33 +155,50 @@ Game.generateMap = () => {
     const h = config.map.height;
 
     initializeGameMapWithGround(w, h);
-    carveRiversIntoMap(w, h);
+    carveRiversIntoMap(w, h, () => {
+        buildVillages(w, h, () => {
+            carveRoadsIntoMap(w, h, () => {
+                console.log("map generation finished")
+            });
+        });
+    });
 };
 
-Game.drawPointMapPoint = (x, y, pointCharacter, pointType, display) => {
-    let color = "rgb(0,0,0)";
+Game.drawPointMapPoint = (x, y, ascii, asciiColor, pointType, display) => {
+    // @todo: draw map color and the player color instead of just map
+    let color = null;
     if(pointType === config.map.type.water) {
-        color = constructColor(config.map.water.color.r, config.map.water.color.g, config.map.water.color.b);
+        color = config.map.water.color;
     } else if(pointType === config.map.type.ground) {
-        color = constructColor(config.map.ground.color.r, config.map.ground.color.g, config.map.ground.color.b);
+        color = config.map.ground.color;
+    } else if(pointType === config.map.type.villageGround) {
+        color = config.map.ground.villageGround;
     } else {
         console.error('Unspported map type', pointType);
-        color = constructColor(0, 255, 0);
+        color = "#00FF00";
     }
 
-    display.draw(x, y, pointCharacter, "", color);
+    if(asciiColor === null || asciiColor === undefined) {
+        asciiColor = "";
+    }
+
+    display.draw(x, y, ascii, asciiColor, color);
 };
 
 Game.addEntity = (entity) => {
     entities.push(entity);
 };
 
+/**
+ * This should only be called once at the start of the game. Aftewards, the entities 
+ * handle drawing themselves and cleaning up their past self by calling 
+ * Game.drawPointMapPoint without a character and with a chracter if they want to 
+ * draw themselves in the game
+ */
 Game.drawMap = (display, w, h) => {
-    // update these values based on the players position so they are the center of the screen
     for(let x = 0; x < w; ++x) {
         for(let y = 0; y < h; ++y) {
-            // @todo: need  a smart way to handle this part
-            Game.drawPointMapPoint(x, y, '', Game.map[y][x], display);
+            Game.drawPointMapPoint(x, y, '', null, Game.map[y][x], display);
         }
     }
 };
